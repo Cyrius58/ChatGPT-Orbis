@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'constants/constants.dart';
+import 'screens/chat_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,11 +30,14 @@ class MyApp extends StatelessWidget {
           appBarTheme: AppBarTheme(
             color: cardColor,
           )),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const ChatScreen(),
     );
   }
 }
 
+
+
+/*
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -117,4 +121,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
-}
+}*/
