@@ -18,6 +18,7 @@ class Services {
           return Padding(
             padding: const EdgeInsets.all(18.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
                 Flexible(
                   child: TextWidget(
