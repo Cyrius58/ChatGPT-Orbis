@@ -1,3 +1,4 @@
+import 'package:chatgpt_orbis/widgets/drop_down.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/constants.dart';
@@ -19,10 +20,12 @@ class Services {
             child: Row(
               children: const [
                 Flexible(
-                    child: TextWidget(
-                  label: "Choosen Model :",
-                  fontSize: 16,
-                )),
+                  child: TextWidget(
+                    label: "Choosen Model :",
+                    fontSize: 16,
+                  ),
+                ),
+                Flexible(flex: 2, child: ModelsDropDownWidget()),
               ],
             ),
           );
