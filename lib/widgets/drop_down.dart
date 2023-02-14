@@ -1,3 +1,4 @@
+import 'package:chatgpt_orbis/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -14,7 +15,7 @@ class _ModelsDropDownWidgetState extends State<ModelsDropDownWidget> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton(
-      items: [],
+      items: getModelsItem,
       value: currentModel,
       onChanged: (value) {
         setState(() {
