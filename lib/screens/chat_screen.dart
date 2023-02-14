@@ -1,4 +1,5 @@
 import 'package:chatgpt_orbis/constants/constants.dart';
+import 'package:chatgpt_orbis/widgets/chat_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -53,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ListView.builder(
                 itemCount: 6,
                 itemBuilder: (context, index) {
-                  return const Text("Hello this is a text");
+                  return const ChatWidget();
                 },
               ),
             ),
@@ -97,3 +98,4 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
+//https://www.youtube.com/watch?v=oOkviQ-K560&list=PL333BSi_KSQ_AqZQR98tAjxcXYMmPyr8E&index=7
