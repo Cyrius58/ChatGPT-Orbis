@@ -1,4 +1,5 @@
 import 'package:chatgpt_orbis/constants/constants.dart';
+import 'package:chatgpt_orbis/services/api_services.dart';
 import 'package:chatgpt_orbis/widgets/chat_widget.dart';
 import 'package:chatgpt_orbis/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +94,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            try {
+                              await ApiService.getModels();
+                            } catch (error) {
+                              print("Error $error");
+                            }
+                          },
                           icon: const Icon(Icons.send, color: Colors.white))
                     ],
                   ),
