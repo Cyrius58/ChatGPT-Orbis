@@ -13,7 +13,6 @@ class ModelsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-/*
   List<ModelsModel> modelsList = [];
   List<ModelsModel> get getModelsList {
     return modelsList;
@@ -22,5 +21,5 @@ class ModelsProvider with ChangeNotifier {
   Future<List<ModelsModel>> getAllModels() async {
     modelsList = await ApiService.getModels();
     return modelsList;
-  }*/
+  }
 }
