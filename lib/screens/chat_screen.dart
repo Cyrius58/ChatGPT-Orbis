@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:chatgpt_orbis/constants/constants.dart';
+import 'package:chatgpt_orbis/models/chat_models.dart';
 import 'package:chatgpt_orbis/providers/models_provider.dart';
 import 'package:chatgpt_orbis/services/api_services.dart';
 import 'package:chatgpt_orbis/widgets/chat_widget.dart';
@@ -25,19 +26,22 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
 
   late TextEditingController textEditingController;
-
+  late FocusNode focusNode;
   @override
   void initState() {
     textEditingController = TextEditingController();
+    focusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
     textEditingController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
+  List<ChatModel> chatList = [];
   @override
   Widget build(BuildContext context) {
     final modelProvider = Provider.of<ModelsProvider>(context);
@@ -62,12 +66,11 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Flexible(
               child: ListView.builder(
-                itemCount: 6,
+                itemCount: chatList.length,
                 itemBuilder: (context, index) {
                   return ChatWidget(
-                    msg: chatMessages[index]["msg"].toString(),
-                    chatIndex:
-                        int.parse(chatMessages[index]["chatIndex"].toString()),
+                    msg: chatList[index].msg,
+                    chatIndex: chatList[index].chatIndex,
                   );
                 },
               ),
@@ -89,10 +92,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Expanded(
                       child: TextField(
+                        focusNode: focusNode,
                         style: const TextStyle(color: Colors.white),
                         controller: textEditingController,
-                        onSubmitted: (value) {
-                          //TO DO SEND MESSAGE
+                        onSubmitted: (value) async {
+                          await sendMessageFCT(
+                            modelProvider: modelProvider,
+                          );
                         },
                         decoration: const InputDecoration.collapsed(
                             hintText: "How can I Help you ?",
@@ -101,21 +107,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     IconButton(
                       onPressed: () async {
-                        try {
-                          setState(() {
-                            _isTyping = true;
-                          });
-                          final lst = await ApiService.sendMessage(
-                            message: textEditingController.text,
-                            modelId: modelProvider.getCurrentModel,
-                          );
-                        } catch (error) {
-                          log("Error $error");
-                        } finally {
-                          setState(() {
-                            _isTyping = false;
-                          });
-                        }
+                        await sendMessageFCT(
+                          modelProvider: modelProvider,
+                        );
                       },
                       icon: const Icon(
                         Icons.send,
@@ -130,6 +124,30 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> sendMessageFCT({required ModelsProvider modelProvider}) async {
+    try {
+      setState(() {
+        _isTyping = true;
+        chatList.add(ChatModel(msg: textEditingController.text, chatIndex: 0));
+        textEditingController.clear();
+        focusNode.unfocus();
+      });
+      chatList.addAll(
+        await ApiService.sendMessage(
+          message: textEditingController.text,
+          modelId: modelProvider.getCurrentModel,
+        ),
+      );
+      setState(() {});
+    } catch (error) {
+      log("Error $error");
+    } finally {
+      setState(() {
+        _isTyping = false;
+      });
+    }
   }
 }
 //https://www.youtube.com/watch?v=oOkviQ-K560&list=PL333BSi_KSQ_AqZQR98tAjxcXYMmPyr8E&index=7

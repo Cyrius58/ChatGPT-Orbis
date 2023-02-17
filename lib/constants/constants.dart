@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 Color scaffoldBackgroundColor = const Color(0xFF343541);
 Color cardColor = const Color(0xFF444654);
 
-final chatMessages = [
-  {
+final chatMessages = [];
+
+/*
+{
     "msg": "Hello who are you?",
     "chatIndex": 0,
   },
@@ -30,10 +32,7 @@ final chatMessages = [
     "msg":
         "You're welcome! Let me know if you have any other questions or if there's anything else I can help you with.",
     "chatIndex": 1,
-  },
-];
-
-
+  },*/
 
 /*
 List<String> models = [
