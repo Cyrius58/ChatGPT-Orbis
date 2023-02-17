@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:chatgpt_orbis/constants/constants.dart';
+import 'package:chatgpt_orbis/providers/models_provider.dart';
 import 'package:chatgpt_orbis/services/api_services.dart';
 import 'package:chatgpt_orbis/widgets/chat_widget.dart';
 import 'package:chatgpt_orbis/widgets/text_widget.dart';
@@ -6,6 +9,7 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/src/widgets/container.dart';
 //import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 
 import '../services/assets_manager.dart';
 import '../services/services.dart';
@@ -18,7 +22,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final bool _isTyping = true;
+  bool _isTyping = false;
 
   late TextEditingController textEditingController;
 
@@ -36,6 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final modelProvider = Provider.of<ModelsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -72,41 +77,55 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: Colors.white,
                 size: 18,
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              Material(
-                color: cardColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          style: const TextStyle(color: Colors.white),
-                          controller: textEditingController,
-                          onSubmitted: (value) {
-                            //TO DO SEND MESSAGE
-                          },
-                          decoration: const InputDecoration.collapsed(
-                              hintText: "How can I Help you ?",
-                              hintStyle: TextStyle(color: Colors.grey)),
-                        ),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            try {
-                              await ApiService.getModels();
-                            } catch (error) {
-                              print("Error $error");
-                            }
-                          },
-                          icon: const Icon(Icons.send, color: Colors.white))
-                    ],
-                  ),
-                ),
-              )
             ],
+            const SizedBox(
+              height: 15,
+            ),
+            Material(
+              color: cardColor,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: textEditingController,
+                        onSubmitted: (value) {
+                          //TO DO SEND MESSAGE
+                        },
+                        decoration: const InputDecoration.collapsed(
+                            hintText: "How can I Help you ?",
+                            hintStyle: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        try {
+                          setState(() {
+                            _isTyping = true;
+                          });
+                          final lst = await ApiService.sendMessage(
+                            message: textEditingController.text,
+                            modelId: modelProvider.getCurrentModel,
+                          );
+                        } catch (error) {
+                          log("Error $error");
+                        } finally {
+                          setState(() {
+                            _isTyping = false;
+                          });
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
