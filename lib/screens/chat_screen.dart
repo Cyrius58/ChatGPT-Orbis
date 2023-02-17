@@ -26,9 +26,11 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
 
   late TextEditingController textEditingController;
+  late ScrollController _listScrollController;
   late FocusNode focusNode;
   @override
   void initState() {
+    _listScrollController = ScrollController();
     textEditingController = TextEditingController();
     focusNode = FocusNode();
     super.initState();
@@ -36,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    _listScrollController.dispose();
     textEditingController.dispose();
     focusNode.dispose();
     super.dispose();
@@ -66,6 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Flexible(
               child: ListView.builder(
+                controller: _listScrollController,
                 itemCount: chatList.length,
                 itemBuilder: (context, index) {
                   return ChatWidget(
@@ -126,6 +130,14 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void scrollListToEnd() {
+    _listScrollController.animateTo(
+      _listScrollController.position.maxScrollExtent,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeOut,
+    );
+  }
+
   Future<void> sendMessageFCT({required ModelsProvider modelProvider}) async {
     try {
       setState(() {
@@ -145,9 +157,9 @@ class _ChatScreenState extends State<ChatScreen> {
       log("Error $error");
     } finally {
       setState(() {
+        scrollListToEnd();
         _isTyping = false;
       });
     }
   }
 }
-//https://www.youtube.com/watch?v=oOkviQ-K560&list=PL333BSi_KSQ_AqZQR98tAjxcXYMmPyr8E&index=7
