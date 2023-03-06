@@ -2,10 +2,11 @@ import 'dart:developer';
 
 import 'package:chatgpt_orbis/constants/constants.dart';
 import 'package:chatgpt_orbis/models/chat_models.dart';
+import 'package:chatgpt_orbis/providers/chats_provider.dart';
 import 'package:chatgpt_orbis/providers/models_provider.dart';
 import 'package:chatgpt_orbis/services/api_services.dart';
 import 'package:chatgpt_orbis/widgets/chat_widget.dart';
-import 'package:chatgpt_orbis/widgets/text_widget.dart';
+//import 'package:chatgpt_orbis/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter/src/widgets/container.dart';
 //import 'package:flutter/src/widgets/framework.dart';
@@ -44,10 +45,12 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  List<ChatModel> chatList = [];
+  //List<ChatModel> chatList = [];
   @override
   Widget build(BuildContext context) {
     final modelProvider = Provider.of<ModelsProvider>(context);
+    final chatProvider = Provider.of<ChatProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -70,11 +73,13 @@ class _ChatScreenState extends State<ChatScreen> {
             Flexible(
               child: ListView.builder(
                 controller: _listScrollController,
-                itemCount: chatList.length,
+                itemCount: chatProvider.getchatlist.length, //chatList.length,
                 itemBuilder: (context, index) {
                   return ChatWidget(
-                    msg: chatList[index].msg,
-                    chatIndex: chatList[index].chatIndex,
+                    msg: chatProvider
+                        .getchatlist[index].msg, //chatList[index].msg,
+                    chatIndex: chatProvider
+                        .getchatlist[index].chatIndex, //[index].chatIndex,
                   );
                 },
               ),
@@ -101,8 +106,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         controller: textEditingController,
                         onSubmitted: (value) async {
                           await sendMessageFCT(
-                            modelProvider: modelProvider,
-                          );
+                              modelProvider: modelProvider,
+                              chatProvider: chatProvider);
                         },
                         decoration: const InputDecoration.collapsed(
                             hintText: "How can I Help you ?",
@@ -112,8 +117,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     IconButton(
                       onPressed: () async {
                         await sendMessageFCT(
-                          modelProvider: modelProvider,
-                        );
+                            modelProvider: modelProvider,
+                            chatProvider: chatProvider);
                       },
                       icon: const Icon(
                         Icons.send,
@@ -138,20 +143,26 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Future<void> sendMessageFCT({required ModelsProvider modelProvider}) async {
+  Future<void> sendMessageFCT(
+      {required ModelsProvider modelProvider,
+      required ChatProvider chatProvider}) async {
     try {
       setState(() {
         _isTyping = true;
-        chatList.add(ChatModel(msg: textEditingController.text, chatIndex: 0));
+        //chatList.add(ChatModel(msg: textEditingController.text, chatIndex: 0));
+        chatProvider.addUserMessage(msg: textEditingController.text);
         textEditingController.clear();
         focusNode.unfocus();
       });
-      chatList.addAll(
+      await chatProvider.sendMessageAndGetAnswers(
+          msg: textEditingController.text,
+          chosenModelId: modelProvider.getCurrentModel);
+      /* chatList.addAll(
         await ApiService.sendMessage(
           message: textEditingController.text,
           modelId: modelProvider.getCurrentModel,
         ),
-      );
+      ); */
       setState(() {});
     } catch (error) {
       log("Error $error");
