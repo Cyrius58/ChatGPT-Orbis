@@ -6,6 +6,7 @@ import 'package:chatgpt_orbis/providers/chats_provider.dart';
 import 'package:chatgpt_orbis/providers/models_provider.dart';
 import 'package:chatgpt_orbis/services/api_services.dart';
 import 'package:chatgpt_orbis/widgets/chat_widget.dart';
+import 'package:chatgpt_orbis/widgets/text_widget.dart';
 //import 'package:chatgpt_orbis/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter/src/widgets/container.dart';
@@ -146,6 +147,17 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> sendMessageFCT(
       {required ModelsProvider modelProvider,
       required ChatProvider chatProvider}) async {
+    if (textEditingController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: TextWidget(
+            label: "Please type a message",
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     try {
       setState(() {
         _isTyping = true;
@@ -166,6 +178,14 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {});
     } catch (error) {
       log("Error $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: TextWidget(
+            label: error.toString(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       setState(() {
         scrollListToEnd();
