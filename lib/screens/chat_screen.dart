@@ -147,11 +147,11 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> sendMessageFCT(
       {required ModelsProvider modelProvider,
       required ChatProvider chatProvider}) async {
-    if (textEditingController.text.isEmpty) {
+    if (_isTyping) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: TextWidget(
-            label: "Please type a message",
+            label: "Please wait end of responseto send an other question",
           ),
           backgroundColor: Colors.red,
         ),
@@ -159,16 +159,16 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
     try {
+      String msg = textEditingController.text;
       setState(() {
         _isTyping = true;
         //chatList.add(ChatModel(msg: textEditingController.text, chatIndex: 0));
-        chatProvider.addUserMessage(msg: textEditingController.text);
+        chatProvider.addUserMessage(msg: msg);
         textEditingController.clear();
         focusNode.unfocus();
       });
       await chatProvider.sendMessageAndGetAnswers(
-          msg: textEditingController.text,
-          chosenModelId: modelProvider.getCurrentModel);
+          msg: msg, chosenModelId: modelProvider.getCurrentModel);
       /* chatList.addAll(
         await ApiService.sendMessage(
           message: textEditingController.text,
