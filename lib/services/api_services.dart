@@ -35,17 +35,19 @@ class ApiService {
   }
 
   //Send Message using ChatGPT API :
+
+  static List<String> finalContent = [];
   static Future<List<ChatModel>> sendMessageGPT({
     required String message,
     required String modelId,
   }) async {
     try {
-      log("model $modelId");
+      //log("model $modelId");
       var response = await http.post(
         Uri.parse("$BASE_URL/chat/completions"),
         headers: {
           'Authorization': 'Bearer $API_KEY',
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json; charset=utf-8'
         },
         body: jsonEncode(
           {
@@ -54,16 +56,33 @@ class ApiService {
               {
                 "role": "user",
                 "content": message,
-              }
+              },
+              for (var content in finalContent) jsonDecode(content)
             ]
           },
         ),
       );
 
       Map jsonResponse = jsonDecode(response.body);
+      //log(jsonResponse['choices'][0]['message'].toString(), name: 'Assistant Message');
+
+      final contentFirstPart = message;
+      final contentFirstPartRemastered =
+          'Question précédente de l\'user : $contentFirstPart';
+
+      final contentSecondPart =
+          jsonResponse['choices'][0]['message']['content'];
+      final contentSecondPartRemastered =
+          'Réponse précédente de l\'assistant : $contentSecondPart';
+
+      final tempContent =
+          '{"role": "user","content":"$contentFirstPartRemastered | $contentSecondPartRemastered"}';
+      final finalTempContent = tempContent.replaceAll(RegExp('\n'), '');
+      finalContent.add(finalTempContent);
+      //print(finalContent);
 
       if (jsonResponse['error'] != null) {
-        //print("jsonResponse['error'] ${jsonResponse['error']["message"]}");
+        //log("jsonResponse['error'] ${jsonResponse['error']["message"]}");
         throw HttpException(jsonResponse['error']["message"]);
       }
       List<ChatModel> chatList = [];
@@ -84,6 +103,19 @@ class ApiService {
     }
   }
 
+/*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+**/
   //Send Message Function :
   static Future<List<ChatModel>> sendMessage({
     required String message,
